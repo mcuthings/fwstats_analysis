@@ -2,6 +2,7 @@ import pandas as pd
 import re
 import matplotlib.pyplot as plt
 
+
 logfile = 'fwstats_test.log'
 # logfile = 'mlan_stat_all_xperia.log'
 
@@ -47,38 +48,59 @@ with open(file=logfile, mode='r', encoding='utf8') as f:
             total_sum = [x + y for x, y in zip(total_sum,value_list)]
 
 # Prepare plotting, create a dataframe
-plt.rcParams["font.family"] = "DejaVu Serif"
+plt.rcParams["font.family"] = "Sans Serif"
 df = pd.DataFrame(data_list)
 Series_sum = pd.Series(total_sum)
 total_packets = Series_sum.sum()
+Series_sum_ratio=[0]*24
+
+label = []
 
 # Percentile the number of MCS packets that was transmitted.
 for i in range(24):
-    Series_sum[i] = (Series_sum[i]/total_packets) * 100
-
-#plt.figure()
-#fig, ax = plt.subplot(121)
+    Series_sum_ratio[i] = int((Series_sum[i]/total_packets) * 100)
 
 # Building plots
-
-plt.figure(figsize=(10, 6))
+plt.figure(figsize=(14, 6))
 #############################
 #    Graph #1 Bar Graph     #
 #############################
-plt.subplot(2,2,1)
-plt.bar(df.index, df[0])
+plt.subplot(2,3,1)
+plt.bar(df.index, df[0], label='MCS0 RX')
+plt.title(f'The num of Packets {param_type}', fontsize=10)
+plt.legend(loc='upper left', bbox_to_anchor=(1,1), ncol=2, fontsize=8)
+
 for i in range(23):
-    plt.bar(df.index, df[i+1], bottom=df[i])
+    if i % 2 == 0:
+        label = f'MCS{int(i/2)} TX'
+    else:
+        label = f'MCS{int((i+1)/2)} RX'
+
+    plt.bar(df.index, df[i+1], bottom=df[i], label=label)
+    plt.legend(loc='upper left', bbox_to_anchor=(1, 1),ncol=2, fontsize=8)
+plt.xlabel('Time')
+plt.ylabel('Count of Packets')
+
 #############################
 #    Graph #2 Histgram      #
 #############################
-plt.subplot(2,2,2)
+plt.subplot(2,3,4)
+plt.subplots_adjust(hspace=0.5)
 plt.bar(Series_sum.index, Series_sum)
+plt.xlabel(f'{param_type} num (TX/RX)')
+ticks = [str(i) for i in range(24)]
+mcs_labels=['0','1','2','3','4','5','6','7','8','9','10','11']
+plt.xticks([0,2,4,6,8,10,12,14,16,18,20,22], labels=mcs_labels, fontsize=10)
+plt.ylabel('num of packets')
+plt.title(f'num of {param_type} packets', fontsize=10)
+
 #############################
 #    Graph #3 Pie Graph     #
 #############################
-plt.subplot(2,2,3)
-plt.pie(Series_sum, radius=1.2)
+plt.subplot(2,3,5)
+pie_labels=['RX 0','TX 0', 'RX 1', 'TX 1', 'RX 2', 'TX 2', 'RX 3', 'TX 3', 'RX 4', 'TX 4', 'RX 5', 'TX 5', 'RX 6', 'TX 6', 'RX 7', 'TX 7', 'RX 8', 'TX 8', 'RX 9', 'TX 9', 'RX 10', 'TX 10', 'RX 11', 'TX 11']
+plt.pie(Series_sum_ratio, radius=1.0, labels=pie_labels, startangle=90, autopct='%1.1f%%')
+plt.title('Ratio of each MCS %', fontsize=10)
 
 plt.show()
 
