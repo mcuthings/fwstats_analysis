@@ -15,6 +15,18 @@ pattern_he = r'([A-Z]+)\(TxRx\), ([A-Z]{2}), (\d+),(\d+), (\d+),(\d+), (\d+),(\d
 pattern_vht = r'([A-Z]+)\(TxRx\), ([A-Z]{3}), (\d+),(\d+), (\d+),(\d+), (\d+),(\d+), (\d+),(\d+), (\d+),(\d+),' + \
               r' (\d+),(\d+), (\d+),(\d+), (\d+),(\d+), (\d+),(\d+), (\d+),(\d+),'
 
+pattern_nss = r'NSS\(TxRx\), (\d+),(\d+),'
+pattern_bw = r'BW\(TxRx\), (\d+),(\d+), (\d+),(\d+), (\d+),(\d+), (\d+),(\d+),'
+pattern_preamble = r'PREAMBLE\(TxRx\), (\d+),(\d+), (\d+),(\d+), (\d+),(\d+), (\d+),(\d+), (\d+), (\d+),'
+pattern_rts = r'RTS\(Tx\), (\d+),'
+pattern_ldpc = r'LDPC\(Tx\), (\d+),'
+pattern_rssi_ack = r'RSSI_ACK\(Tx\), (\d+),'
+pattern_txbf = r'LDPC_TXBF\(Rx\), (\d+),(\d+),'
+pattern_nsts = r'NSTS\(Rx\), (\d+),'
+pattern_rssi = r'RSSI\(Rx\), (\d+),(\d+),'
+pattern_rssi_ant0 = r'RSSI_ANT0\(Rx\), (\d+),(\d+),(\d+),(\d+),'
+pattern_rssi_ant1 = r'RSSI_ANT1\(Rx\), (\d+),(\d+),(\d+),(\d+),'
+
 # Input and select an item
 param_type = st.selectbox('Select', ['MCS','SGI','STBC'])
 param_gen = st.selectbox('Select Wi-Fi',['HT','VHT','HE'])
@@ -91,9 +103,10 @@ def stats():
     plt.subplots_adjust(hspace=0.5, bottom=-0.1)
     plt.bar(series_sum.index, series_sum)
     plt.xlabel(f'{param_type} num (TX/RX)')
-    # ticks = [str(i) for i in range(24)]
-    mcs_labels=['0','1','2','3','4','5','6','7','8','9','10','11']
-    plt.xticks([0,2,4,6,8,10,12,14,16,18,20,22], labels=mcs_labels, fontsize=10)
+    x_labels = [i for i in range(int(num/2))]
+    x_ticks =[i for i in range(num) if i % 2 == 0]
+    plt.xticks(x_ticks, labels=x_labels, fontsize=10)
+
     plt.ylabel('num of packets')
     plt.title(f'num of {param_type} packets', fontsize=12)
 
