@@ -4,8 +4,7 @@ import matplotlib.pyplot as plt
 import streamlit as st
 import pathlib
 
-
-# logfile = 'fwstats_test.log'
+# Please define Fwstats file neme
 file_name = 'fwstats_test.log'
 
 pattern_ht = r'([A-Z]+)\(TxRx\), ([A-Z]{2}), (\d+),(\d+), (\d+),(\d+), (\d+),(\d+), (\d+),(\d+), (\d+),(\d+),' + \
@@ -16,7 +15,6 @@ pattern_he = r'([A-Z]+)\(TxRx\), ([A-Z]{2}), (\d+),(\d+), (\d+),(\d+), (\d+),(\d
              r' (\d+),(\d+), (\d+),(\d+), (\d+),(\d+), (\d+),(\d+), (\d+),(\d+), (\d+),(\d+), (\d+),(\d+),'
 pattern_vht = r'([A-Z]+)\(TxRx\), ([A-Z]{3}), (\d+),(\d+), (\d+),(\d+), (\d+),(\d+), (\d+),(\d+), (\d+),(\d+),' + \
               r' (\d+),(\d+), (\d+),(\d+), (\d+),(\d+), (\d+),(\d+), (\d+),(\d+),'
-
 pattern_nss = r'NSS\(TxRx\), (\d+),(\d+), (\d+),(\d+),'
 pattern_bw = r'BW\(TxRx\), (\d+),(\d+), (\d+),(\d+), (\d+),(\d+),'
 pattern_preamble = r'PREAMBLE\(TxRx\), (\d+),(\d+), (\d+),(\d+), (\d+),(\d+), (\d+),(\d+), (\d+), (\d+),'
@@ -47,6 +45,7 @@ param_gen = ''
 
 class NoLogfileError(Exception):
     pass
+
 
 def find_logfile(file):
     file_path = pathlib.Path('./')
