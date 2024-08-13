@@ -58,7 +58,7 @@ def find_logfile(file):
 def counting_packets(_pattern, num, line):
     match = re.search(_pattern, line)
     if match:
-        return [int(match.group(i+1)) for i in range(num)]
+        return [-90 if int(match.group(i+1)) == 0 else int(match.group(i+1)) for i in range(num)]
     return
 
 
@@ -258,7 +258,7 @@ def stats():
     plt.title(f'RSSI ANT0', fontsize=12)
     plt.xlabel('Time')
     plt.ylabel('Rx signal [dBm]')
-    plt.ylim(-20, -80)
+    plt.ylim(-80, -20)
     plt.legend()
 
     # RSSI ANT1
@@ -268,7 +268,7 @@ def stats():
     plt.xlabel('Time')
     plt.ylabel('Rx signal [dBm]')
     plt.gca().invert_yaxis()
-    plt.ylim(-20, -80)
+    plt.ylim(-80, -20)
     plt.legend()
 
     # NSS
