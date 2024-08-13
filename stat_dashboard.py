@@ -2,9 +2,11 @@ import pandas as pd
 import re
 import matplotlib.pyplot as plt
 import streamlit as st
+import pathlib
 
 
-logfile = 'fwstats_test.log'
+# logfile = 'fwstats_test.log'
+file_name = 'fwstats_test.log'
 
 pattern_ht = r'([A-Z]+)\(TxRx\), ([A-Z]{2}), (\d+),(\d+), (\d+),(\d+), (\d+),(\d+), (\d+),(\d+), (\d+),(\d+),' + \
              r' (\d+),(\d+), (\d+),(\d+), (\d+),(\d+), (\d+),(\d+), (\d+),(\d+), (\d+),(\d+), (\d+),(\d+),' + \
@@ -43,10 +45,20 @@ param_type = ''
 param_gen = ''
 
 
+class NoLogfileError(Exception):
+    pass
+
+def find_logfile(file):
+    file_path = pathlib.Path('./')
+    file_path = file_path / file
+    if not file_path.exists():
+        raise NoLogfileError(file)
+    return file_path
+
+
 def counting_packets(_pattern, num, line):
     match = re.search(_pattern, line)
     if match:
-        # return st.write(match.group(3))
         return [int(match.group(i+1)) for i in range(num)]
     return
 
@@ -92,6 +104,12 @@ def stats():
     rssi_ant1_list = []
 
     # Open and search the pattern
+    try:
+        logfile = find_logfile(file_name)
+    except NoLogfileError as err:
+        st.write('Couldn\'t find {}'.format(file_name))
+        return
+
     with open(file=logfile, mode='r', encoding='utf8') as f:
         for line in f:
             match = re.search(pattern, line)
