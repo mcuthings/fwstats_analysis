@@ -4,8 +4,7 @@ import matplotlib.pyplot as plt
 import streamlit as st
 import pathlib
 
-# Please define Fwstats file neme
-file_name = 'fwstats_test.log'
+logfile = ''
 
 pattern_ht = r'([A-Z]+)\(TxRx\), ([A-Z]{2}), (\d+),(\d+), (\d+),(\d+), (\d+),(\d+), (\d+),(\d+), (\d+),(\d+),' + \
              r' (\d+),(\d+), (\d+),(\d+), (\d+),(\d+), (\d+),(\d+), (\d+),(\d+), (\d+),(\d+), (\d+),(\d+),' + \
@@ -47,12 +46,22 @@ class NoLogfileError(Exception):
     pass
 
 
-def find_logfile(file):
+def find_logfile():
     file_path = pathlib.Path('./')
-    file_path = file_path / file
-    if not file_path.exists():
-        raise NoLogfileError(file)
-    return file_path
+    files = list(file_path.rglob('*.log'))
+    if not files:
+        raise NoLogfileError(files)
+    print(files)
+    return files
+
+
+def search_logfiles():
+    try:
+        file_list = find_logfile()
+    except NoLogfileError as err:
+        st.write('Couldn\'t find log file(s)')
+        return
+    return file_list
 
 
 def counting_packets(_pattern, num, line):
@@ -66,7 +75,14 @@ def st_sidebar():
     with st.sidebar:
         global param_type
         global param_gen
-        st.title('Select Packet and 80211 class')
+        global logfile
+
+        st.title('Select logfile and item')
+        logfiles = search_logfiles()
+        if logfiles:
+            logfile = st.selectbox('Select log file', logfiles)
+        else:
+            st.write('Please prepare log files')
         param_type = st.selectbox('Select', ['MCS','SGI','STBC'])
         param_gen = st.selectbox('Select Wi-Fi Class',['HT','VHT','HE'])
 
@@ -102,11 +118,9 @@ def stats():
     rssi_ant0_list = []
     rssi_ant1_list = []
 
-    # Open and search the pattern
-    try:
-        logfile = find_logfile(file_name)
-    except NoLogfileError as err:
-        st.write('Couldn\'t find {}'.format(file_name))
+    # Check logfile
+    if not logfile:
+        print('Couldn\'t log files')
         return
 
     with open(file=logfile, mode='r', encoding='utf8') as f:
